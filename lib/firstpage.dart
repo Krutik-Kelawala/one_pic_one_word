@@ -1,6 +1,8 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:one_pic_one_word/secondpag.dart';
 
 class firstpg extends StatefulWidget {
@@ -82,17 +84,39 @@ class _firstpgState extends State<firstpg> {
                   child: FlatButton(
                     color: Colors.amberAccent,
                     onPressed: () {
-                      AwesomeDialog(
+                      showAnimatedDialog(
                         context: context,
-                        dialogType: DialogType.WARNING,
-                        animType: AnimType.BOTTOMSLIDE,
-                        title: 'EXIT',
-                        desc: 'Are you sure exit the game?',
-                        btnCancelOnPress: () {
-                          Navigator.pop(context);
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return ClassicGeneralDialogWidget(
+                            titleText: 'Exit',
+                            contentText: 'Are you sure exit the game?',
+                            onPositiveClick: () {
+                              Navigator.of(context).pop();
+                              SystemNavigator.pop();
+                            },
+                            onNegativeClick: () {
+                              Navigator.of(context, rootNavigator: false).pop();
+                            },
+                          );
                         },
-                        btnOkOnPress: () {},
-                      )..show();
+                        animationType: DialogTransitionType.fadeScale,
+                        curve: Curves.fastOutSlowIn,
+                        duration: Duration(seconds: 1),
+                      );
+                      // AwesomeDialog(
+                      //   context: context,
+                      //   dialogType: DialogType.WARNING,
+                      //   animType: AnimType.BOTTOMSLIDE,
+                      //   title: 'EXIT',
+                      //   desc: 'Are you sure exit the game?',
+                      //   btnCancelOnPress: () {
+                      //     Navigator.of(context, rootNavigator: false);
+                      //   },
+                      //   btnOkOnPress: () {
+                      //     SystemNavigator.pop();
+                      //   },
+                      // )..show();
                     },
                     child: Text("Exit"),
                     shape: RoundedRectangleBorder(

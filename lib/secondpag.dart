@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,6 +11,7 @@ import 'firstpage.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: firstpg(),
   ));
 }
@@ -21,6 +24,18 @@ class mainpage extends StatefulWidget {
 class _mainpageState extends State<mainpage> {
   List imagepathlist = [];
   String changeimage = "";
+  List bottomlist = [];
+  List toplist = [];
+  List answerlist = [];
+  String spelling = "";
+  String abcd = "";
+  List abcdlist = [];
+  int cnt = 0; // for bottomlist return
+  int abc = 0; // for top list return
+  String imagepath = "";
+  List cheklist = List.filled(10, "");
+  bool winstage = false;
+  String winnig = "";
 
   @override
   void initState() {
@@ -45,14 +60,14 @@ class _mainpageState extends State<mainpage> {
     setState(() {
       imagepathlist = imagePaths;
       imagepathlist.shuffle();
-      changeimage = imagepathlist[1];
+      changeimage = imagepathlist[0];
       print(imagePaths);
 
       // for understanding
 
       // int a = Random().nextInt(imagepathlist.length);
-      // String imagepath = imagepathlist[a];
-      String imagepath = "Image/almond.webp";
+      // imagepath = imagepathlist[a];
+      // String imagepath = "Image/almond.webp";
       // print(imagepath);
       //
       // List<String> list1 = imagepath.split("/");//[Image, almond.webp]
@@ -62,29 +77,31 @@ class _mainpageState extends State<mainpage> {
       // List<String> list2 = s1.split("\.");//[almond, webp]
       // print(list2);
 
-      String spelling = imagepath.split("/")[1].split("\.")[0]; //almond
-      print(spelling);
+      spelling = imagepathlist[0].split("/")[1].split("\.")[0]; //almond
+      print("spel--$spelling");
 
-      List answerlist = spelling.split("");
-      print(answerlist);
+      answerlist = spelling.split("");
+      print("ans--$answerlist");
 
-      List tooltips = List.filled(answerlist.length, "");
-      print(tooltips);
+      toplist = List.filled(answerlist.length, "");
 
-      String abcd = "abcdefghijklmnopqrstuvwxyz";
-      List abcdlist = abcd.split(
+      print("top--$toplist");
+
+      abcd = "abcdefghijklmnopqrstuvwxyz";
+      abcdlist = abcd.split(
           ""); //[a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]
       abcdlist.shuffle();
-      print(abcdlist);
+      print("abcd--$abcdlist");
 
-      List bottomlist = abcdlist.getRange(0, 10 - answerlist.length).toList();
-      print(bottomlist);
+      bottomlist = abcdlist.getRange(0, 10 - answerlist.length).toList();
+      print('bottom1--$bottomlist');
 
       bottomlist.addAll(answerlist);
       bottomlist.shuffle();
-      print(bottomlist);
+      print("btm--$bottomlist");
     });
   }
+
   String a = "";
 
   @override
@@ -117,6 +134,7 @@ class _mainpageState extends State<mainpage> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.deepPurpleAccent),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
                       height: bodyheight * 0.3,
@@ -128,6 +146,40 @@ class _mainpageState extends State<mainpage> {
                       margin: EdgeInsets.all(bodyheight * 0.01),
                       child: Center(child: Image.asset("${changeimage}")),
                     ),
+                    Container(
+                      height: bodyheight * 0.1,
+                      child: ListView.builder(
+                        itemCount: answerlist.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (toplist[index].toString().isNotEmpty) {
+                                  abc = cheklist.indexOf(toplist[index]);
+                                  bottomlist[abc] = toplist[index];
+                                  toplist[index] = "";
+                                  cnt--;
+                                  print("aaa$cnt");
+                                }
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white54,
+                                  border: Border.all(width: 1),
+                                  borderRadius: BorderRadius.circular(10)),
+                              width: thewidth * 0.1,
+                              margin: EdgeInsets.all(bodyheight * 0.01),
+                              child: Center(
+                                  child: Text("${toplist[index]}",
+                                      style: TextStyle(
+                                          fontSize: bodyheight * 0.04))),
+                            ),
+                          );
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -137,8 +189,67 @@ class _mainpageState extends State<mainpage> {
                 decoration: BoxDecoration(
                     color: Colors.grey,
                     borderRadius: BorderRadius.circular(10)),
-                child: Container(
-                  // child: Inputbutton(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      height: bodyheight * 0.22,
+                      child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 10,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5),
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (bottomlist[index].toString().isNotEmpty) {
+                                  toplist[cnt] = bottomlist[index];
+                                  cheklist[index] = bottomlist[index];
+                                  bottomlist[index] = "";
+                                  cnt++;
+                                  win();
+                                }
+                              });
+                            },
+                            child: Container(
+                              margin: EdgeInsets.all(bodyheight * 0.01),
+                              decoration: BoxDecoration(
+                                  color: Colors.white54,
+                                  border: Border.all(width: 1),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Center(
+                                  child: Text(
+                                "${bottomlist[index]}",
+                                style: TextStyle(fontSize: bodyheight * 0.04),
+                              )),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Container(
+                      height: bodyheight * 0.05,width: thewidth * 0.5,
+                      decoration: BoxDecoration(
+                          color: Colors.white54,
+                          border: Border.all(width: 1),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(child: Text("${winnig}")),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          height: bodyheight * 0.05,
+                          child: Icon(Icons.error_outline),
+                        ),
+                        Container(
+                          height: bodyheight * 0.05,
+                          child: Icon(Icons.error_outline),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               )
             ],
@@ -156,7 +267,7 @@ class _mainpageState extends State<mainpage> {
       title: 'EXIT',
       desc: 'Are you sure exit the game?',
       btnCancelOnPress: () {
-        Navigator.pop(context);
+        Navigator.of(context, rootNavigator: false);
       },
       btnOkOnPress: () {
         Navigator.pushReplacement(context, MaterialPageRoute(
@@ -169,18 +280,12 @@ class _mainpageState extends State<mainpage> {
     return Future.value(true);
   }
 
-  List<Widget> Inputbutton() {
-    List<Widget> temp = [];
-    for (int i = 0; i < 10; i++) {
-      temp.add(Container(
-        child: Center(
-          child: Text(
-            "${i}",
-            style: TextStyle(color: Colors.black, fontSize: 20,),
-          ),
-        ),
-      ));
+  void win() {
+    if (listEquals(toplist, answerlist) == true) {
+      setState(() {
+        winstage = true;
+        winnig = "You are Win.!";
+      });
     }
-    return temp;
   }
 }
