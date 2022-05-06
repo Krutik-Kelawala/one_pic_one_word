@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import 'firstpage.dart';
 
@@ -22,6 +23,7 @@ class mainpage extends StatefulWidget {
 }
 
 class _mainpageState extends State<mainpage> {
+  Color wincolour = Colors.white54;
   List imagepathlist = [];
   String changeimage = "";
   List bottomlist = [];
@@ -34,8 +36,10 @@ class _mainpageState extends State<mainpage> {
   int abc = 0; // for top list return
   String imagepath = "";
   List cheklist = List.filled(10, "");
-  bool winstage = false;
+  bool winstage = false; //
   String winnig = "";
+
+  // FlutterTts flutterTts = FlutterTts(); // for speech
 
   @override
   void initState() {
@@ -77,7 +81,11 @@ class _mainpageState extends State<mainpage> {
       // List<String> list2 = s1.split("\.");//[almond, webp]
       // print(list2);
 
-      spelling = imagepathlist[0].split("/")[1].split("\.")[0]; //almond
+      spelling = imagepathlist[0]
+          .split("/")[1]
+          .split("\.")[0]
+          .toString()
+          .toUpperCase(); //almond
       print("spel--$spelling");
 
       answerlist = spelling.split("");
@@ -87,7 +95,7 @@ class _mainpageState extends State<mainpage> {
 
       print("top--$toplist");
 
-      abcd = "abcdefghijklmnopqrstuvwxyz";
+      abcd = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       abcdlist = abcd.split(
           ""); //[a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]
       abcdlist.shuffle();
@@ -149,6 +157,7 @@ class _mainpageState extends State<mainpage> {
                     Container(
                       height: bodyheight * 0.1,
                       child: ListView.builder(
+                        shrinkWrap: true,
                         itemCount: answerlist.length,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {
@@ -160,13 +169,13 @@ class _mainpageState extends State<mainpage> {
                                   bottomlist[abc] = toplist[index];
                                   toplist[index] = "";
                                   cnt--;
-                                  print("aaa$cnt");
+                                  print("aaa${cnt}");
                                 }
                               });
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: Colors.white54,
+                                  color: wincolour,
                                   border: Border.all(width: 1),
                                   borderRadius: BorderRadius.circular(10)),
                               width: thewidth * 0.1,
@@ -188,7 +197,9 @@ class _mainpageState extends State<mainpage> {
                 margin: EdgeInsets.all(bodyheight * 0.01),
                 decoration: BoxDecoration(
                     color: Colors.grey,
-                    borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        topRight: Radius.circular(30))),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -206,6 +217,8 @@ class _mainpageState extends State<mainpage> {
                                 if (bottomlist[index].toString().isNotEmpty) {
                                   toplist[cnt] = bottomlist[index];
                                   cheklist[index] = bottomlist[index];
+                                  // flutterTts
+                                  //     .speak("${bottomlist[index].toString()}");
                                   bottomlist[index] = "";
                                   cnt++;
                                   win();
@@ -229,7 +242,8 @@ class _mainpageState extends State<mainpage> {
                       ),
                     ),
                     Container(
-                      height: bodyheight * 0.05,width: thewidth * 0.5,
+                      height: bodyheight * 0.05,
+                      width: thewidth * 0.5,
                       decoration: BoxDecoration(
                           color: Colors.white54,
                           border: Border.all(width: 1),
@@ -239,13 +253,19 @@ class _mainpageState extends State<mainpage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Container(
-                          height: bodyheight * 0.05,
-                          child: Icon(Icons.error_outline),
+                        InkWell(
+                          onTap: () {},
+                          child: Container(
+                            height: bodyheight * 0.05,
+                            child: Icon(Icons.error_outline),
+                          ),
                         ),
-                        Container(
-                          height: bodyheight * 0.05,
-                          child: Icon(Icons.error_outline),
+                        InkWell(
+                          onTap: () {},
+                          child: Container(
+                            height: bodyheight * 0.05,
+                            child: Icon(Icons.close),
+                          ),
                         ),
                       ],
                     ),
@@ -281,11 +301,22 @@ class _mainpageState extends State<mainpage> {
   }
 
   void win() {
-    if (listEquals(toplist, answerlist) == true) {
+    if (toplist.toString() == answerlist.toString()) {
       setState(() {
+        wincolour = Colors.green;
         winstage = true;
         winnig = "You are Win.!";
       });
+      Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) {
+          return mainpage();
+        },
+      ));
     }
+    // else if(toplist.toString() == answerlist.toString()) {
+    //   setState(() {
+    //     wincolour = Colors.yellow;
+    //   });
+    // }
   }
 }

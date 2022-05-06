@@ -104,19 +104,6 @@ class _firstpgState extends State<firstpg> {
                         curve: Curves.fastOutSlowIn,
                         duration: Duration(seconds: 1),
                       );
-                      // AwesomeDialog(
-                      //   context: context,
-                      //   dialogType: DialogType.WARNING,
-                      //   animType: AnimType.BOTTOMSLIDE,
-                      //   title: 'EXIT',
-                      //   desc: 'Are you sure exit the game?',
-                      //   btnCancelOnPress: () {
-                      //     Navigator.of(context, rootNavigator: false);
-                      //   },
-                      //   btnOkOnPress: () {
-                      //     SystemNavigator.pop();
-                      //   },
-                      // )..show();
                     },
                     child: Text("Exit"),
                     shape: RoundedRectangleBorder(
