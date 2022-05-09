@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
+import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -39,7 +39,8 @@ class _mainpageState extends State<mainpage> {
   bool winstage = false; //
   String winnig = "";
 
-  // FlutterTts flutterTts = FlutterTts(); // for speech
+  FlutterTts flutterTts = FlutterTts(); // for speech
+  AudioPlayer player = AudioPlayer(); // for audio
 
   @override
   void initState() {
@@ -47,6 +48,14 @@ class _mainpageState extends State<mainpage> {
     super.initState();
 
     _initImages();
+    audioplay();
+  }
+  audioplay() async {
+    String audioasset = "audio/totcoisou.wav";
+    ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+    Uint8List audiobytes =
+    bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    player.playBytes(audiobytes);
   }
 
   Future _initImages() async {
@@ -125,154 +134,183 @@ class _mainpageState extends State<mainpage> {
       onWillPop: onback,
       child: Scaffold(
         backgroundColor: Colors.tealAccent,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: bodyheight * 0.5,
-                margin: EdgeInsets.all(bodyheight * 0.01),
-                decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.green,
-                          offset: Offset(2, 2),
-                          blurRadius: 5)
-                    ],
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.deepPurpleAccent),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: bodyheight * 0.3,
-                      width: thewidth * 0.5,
-                      alignment: AlignmentDirectional.topCenter,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white),
-                      margin: EdgeInsets.all(bodyheight * 0.01),
-                      child: Center(child: Image.asset("${changeimage}")),
-                    ),
-                    Container(
-                      height: bodyheight * 0.1,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: answerlist.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                if (toplist[index].toString().isNotEmpty) {
-                                  abc = cheklist.indexOf(toplist[index]);
-                                  bottomlist[abc] = toplist[index];
-                                  toplist[index] = "";
-                                  cnt--;
-                                  print("aaa${cnt}");
-                                }
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: wincolour,
-                                  border: Border.all(width: 1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              width: thewidth * 0.1,
-                              margin: EdgeInsets.all(bodyheight * 0.01),
-                              child: Center(
-                                  child: Text("${toplist[index]}",
-                                      style: TextStyle(
-                                          fontSize: bodyheight * 0.04))),
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                height: bodyheight * 0.4,
-                margin: EdgeInsets.all(bodyheight * 0.01),
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        topRight: Radius.circular(30))),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      height: bodyheight * 0.22,
-                      child: GridView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 10,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5),
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () {
-                              setState(() {
-                                if (bottomlist[index].toString().isNotEmpty) {
-                                  toplist[cnt] = bottomlist[index];
-                                  cheklist[index] = bottomlist[index];
-                                  // flutterTts
-                                  //     .speak("${bottomlist[index].toString()}");
-                                  bottomlist[index] = "";
-                                  cnt++;
-                                  win();
-                                }
-                              });
-                            },
-                            child: Container(
-                              margin: EdgeInsets.all(bodyheight * 0.01),
-                              decoration: BoxDecoration(
-                                  color: Colors.white54,
-                                  border: Border.all(width: 1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Center(
-                                  child: Text(
-                                "${bottomlist[index]}",
-                                style: TextStyle(fontSize: bodyheight * 0.04),
-                              )),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Container(
-                      height: bodyheight * 0.05,
-                      width: thewidth * 0.5,
-                      decoration: BoxDecoration(
-                          color: Colors.white54,
-                          border: Border.all(width: 1),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(child: Text("${winnig}")),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: Container(
-                            height: bodyheight * 0.05,
-                            child: Icon(Icons.error_outline),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {},
-                          child: Container(
-                            height: bodyheight * 0.05,
-                            child: Icon(Icons.close),
-                          ),
-                        ),
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: bodyheight * 0.5,
+                  margin: EdgeInsets.all(bodyheight * 0.01),
+                  decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.green,
+                            offset: Offset(2, 2),
+                            blurRadius: 5)
                       ],
-                    ),
-                  ],
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.deepPurpleAccent),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: bodyheight * 0.3,
+                        width: thewidth * 0.5,
+                        alignment: AlignmentDirectional.topCenter,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.white),
+                        margin: EdgeInsets.all(bodyheight * 0.01),
+                        child: Center(child: Image.asset("${changeimage}")),
+                      ),
+                      Container(
+                        height: bodyheight * 0.1,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: answerlist.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+
+                                // player.playBytes();
+
+                                setState(() {
+                                  if (toplist[index].toString().isNotEmpty) {
+                                    abc = cheklist.indexOf(toplist[index]);
+                                    bottomlist[abc] = toplist[index];
+                                    toplist[index] = "";
+                                    cnt--;
+                                    print("aaa${cnt}");
+                                  }
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: wincolour,
+                                    border: Border.all(width: 1),
+                                    borderRadius: BorderRadius.circular(10)),
+                                width: thewidth * 0.1,
+                                margin: EdgeInsets.all(bodyheight * 0.01),
+                                child: Center(
+                                    child: Text("${toplist[index]}",
+                                        style: TextStyle(
+                                            fontSize: bodyheight * 0.04))),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              )
-            ],
+                Container(
+                  height: bodyheight * 0.4,
+                  margin: EdgeInsets.all(bodyheight * 0.01),
+                  decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          topRight: Radius.circular(30))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: bodyheight * 0.22,
+                        child: GridView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: 10,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5),
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                setState(() {
+                                  if (bottomlist[index].toString().isNotEmpty) {
+                                    toplist[cnt] = bottomlist[index];
+                                    cheklist[index] = bottomlist[index];
+                                    // flutterTts.speak("${answerlist[index]}");
+
+                                    bottomlist[index] = "";
+                                    cnt++;
+                                    win();
+                                    // flutterTts.speak("$spelling");
+                                  }
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(bodyheight * 0.01),
+                                decoration: BoxDecoration(
+                                    color: Colors.white54,
+                                    border: Border.all(width: 1),
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Center(
+                                    child: Text(
+                                  "${bottomlist[index]}",
+                                  style: TextStyle(fontSize: bodyheight * 0.04),
+                                )),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Container(
+                        height: bodyheight * 0.05,
+                        width: thewidth * 0.5,
+                        decoration: BoxDecoration(
+                            color: Colors.white54,
+                            border: Border.all(width: 1),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Center(child: Text("${winnig}")),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            height: bodyheight * 0.05,
+                            child: IconButton(
+                                onPressed: () {
+                                  print("kk");
+                                },
+                                icon: Icon(Icons.close)),
+                          ),
+                          Container(
+                            height: bodyheight * 0.05,
+                            child: IconButton(
+                                onPressed: () {
+                                  showMenu(
+                                      color: Colors.tealAccent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                      context: context,
+                                      position:
+                                          RelativeRect.fromLTRB(300, 500, 0, 0),
+                                      items: [
+                                        PopupMenuItem(
+                                            onTap: () {
+                                              flutterTts.speak("$answerlist");
+                                            },
+                                            child: Text("Word Hint")),
+                                        PopupMenuItem(
+                                            onTap: () {
+                                              flutterTts.speak("$spelling");
+                                            },
+                                            child: Text("Spelling Hint")),
+                                      ]);
+                                  print("ab");
+                                },
+                                icon: Icon(Icons.error_outline_sharp)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -303,9 +341,9 @@ class _mainpageState extends State<mainpage> {
   void win() {
     if (toplist.toString() == answerlist.toString()) {
       setState(() {
-        wincolour = Colors.green;
         winstage = true;
         winnig = "You are Win.!";
+        wincolour = Colors.green;
       });
       Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) {

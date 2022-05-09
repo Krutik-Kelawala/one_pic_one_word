@@ -1,4 +1,6 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
+import 'dart:typed_data';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +13,24 @@ class firstpg extends StatefulWidget {
 }
 
 class _firstpgState extends State<firstpg> {
+  AudioPlayer player = AudioPlayer();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    audioplay();
+  }
+
+  audioplay() async {
+    String audioasset = "backgroundaudio/game-music-7408.mp3";
+    ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+    Uint8List audiobytes =
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    player.playBytes(audiobytes);
+  }
+
   @override
   Widget build(BuildContext context) {
     double theheight = MediaQuery.of(context).size.height;

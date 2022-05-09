@@ -37,6 +37,7 @@ dependencies:
   awesome_dialog:
   flutter_animated_dialog:
   flutter_tts:
+  audioplayers:
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,8 @@ flutter:
   assets:
      - Image/
      - backimg/
+     - audio/
+     - backgroundaudio/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
