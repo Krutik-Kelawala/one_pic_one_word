@@ -38,6 +38,7 @@ class _mainpageState extends State<mainpage> {
   List cheklist = List.filled(10, "");
   bool winstage = false; //
   String winnig = "";
+  List removeanslist = []; // for remove extra word and get hint
 
   FlutterTts flutterTts = FlutterTts(); // for speech
   AudioPlayer player = AudioPlayer(); // for audio
@@ -50,11 +51,12 @@ class _mainpageState extends State<mainpage> {
     _initImages();
     audioplay();
   }
+
   audioplay() async {
     String audioasset = "audio/totcoisou.wav";
     ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
     Uint8List audiobytes =
-    bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
     player.playBytes(audiobytes);
   }
 
@@ -173,8 +175,7 @@ class _mainpageState extends State<mainpage> {
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
-
-                                // player.playBytes();
+                                topbtntap();
 
                                 setState(() {
                                   if (toplist[index].toString().isNotEmpty) {
@@ -227,16 +228,15 @@ class _mainpageState extends State<mainpage> {
                           itemBuilder: (context, index) {
                             return InkWell(
                               onTap: () {
+                                bottombtntapsound();
+
                                 setState(() {
                                   if (bottomlist[index].toString().isNotEmpty) {
                                     toplist[cnt] = bottomlist[index];
                                     cheklist[index] = bottomlist[index];
-                                    // flutterTts.speak("${answerlist[index]}");
-
                                     bottomlist[index] = "";
                                     cnt++;
                                     win();
-                                    // flutterTts.speak("$spelling");
                                   }
                                 });
                               },
@@ -272,6 +272,19 @@ class _mainpageState extends State<mainpage> {
                             height: bodyheight * 0.05,
                             child: IconButton(
                                 onPressed: () {
+                                  setState(() {
+                                    removeanslist = abcdlist
+                                        .getRange(0, 10 - answerlist.length)
+                                        .toList();
+                                    for (int i = 0;
+                                        i < answerlist.length;
+                                        i++) {
+                                      int bottom =
+                                          bottomlist.indexOf(removeanslist[i]);
+                                      bottomlist[bottom] = "";
+                                    }
+                                  });
+
                                   print("kk");
                                 },
                                 icon: Icon(Icons.close)),
@@ -344,6 +357,7 @@ class _mainpageState extends State<mainpage> {
         winstage = true;
         winnig = "You are Win.!";
         wincolour = Colors.green;
+        flutterTts.speak("$spelling");
       });
       Navigator.pushReplacement(context, MaterialPageRoute(
         builder: (context) {
@@ -356,5 +370,21 @@ class _mainpageState extends State<mainpage> {
     //     wincolour = Colors.yellow;
     //   });
     // }
+  }
+
+  bottombtntapsound() async {
+    String audioasset = "audio/edt.wav";
+    ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+    Uint8List audiobytes =
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    player.playBytes(audiobytes);
+  }
+
+  topbtntap() async {
+    String audioasset = "audio/popup.wav";
+    ByteData bytes = await rootBundle.load(audioasset); //load audio from assets
+    Uint8List audiobytes =
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    player.playBytes(audiobytes);
   }
 }

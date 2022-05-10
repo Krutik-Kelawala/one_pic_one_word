@@ -88,6 +88,7 @@ class _firstpgState extends State<firstpg> {
                   child: FlatButton(
                     color: Colors.amberAccent,
                     onPressed: () {
+                      player.stop();
                       Navigator.pushReplacement(context, MaterialPageRoute(
                         builder: (context) {
                           return mainpage();
@@ -112,6 +113,7 @@ class _firstpgState extends State<firstpg> {
                             titleText: 'Exit',
                             contentText: 'Are you sure exit the game?',
                             onPositiveClick: () {
+                              player.stop();
                               Navigator.of(context).pop();
                               SystemNavigator.pop();
                             },
